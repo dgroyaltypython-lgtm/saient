@@ -1,0 +1,13 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<section class="panel" style="max-width:520px;margin:60px auto;padding:32px">
+    <span class="eyebrow">STAFF LOGIN</span>
+    <h1>Sign in to Office Accounts</h1>
+    <p>Your account determines which office data you can access.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="primary" type="submit">Sign In</button>
+    </form>
+</section>
+{% endblock %}

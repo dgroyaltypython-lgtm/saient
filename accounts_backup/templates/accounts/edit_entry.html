@@ -1,0 +1,26 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+<section class="panel" style="max-width:760px;margin:30px auto;padding:28px">
+    <span class="eyebrow">EDIT ENTRY</span>
+    <h1>Correct Transaction</h1>
+    <p>{{ office.name }} · {{ entry.entry_date }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <label>Date<input type="date" name="date" value="{{ entry.entry_date|date:'Y-m-d' }}" required></label>
+        <label>Type<select name="entry_type">
+            <option value="collection" {% if entry.entry_type == "collection" %}selected{% endif %}>Collection</option>
+            <option value="expense" {% if entry.entry_type == "expense" %}selected{% endif %}>Expense</option>
+        </select></label>
+        <label>Amount<input type="number" name="amount" step="0.01" min="0.01" value="{{ entry.amount }}" required></label>
+        <label>Payment Mode<select name="payment_mode">
+            <option value="cash" {% if entry.payment_mode == "cash" %}selected{% endif %}>Cash</option>
+            <option value="upi" {% if entry.payment_mode == "upi" %}selected{% endif %}>UPI</option>
+        </select></label>
+        <label>Reason<input type="text" name="reason" value="{{ entry.reason }}" required></label>
+        <label>Notes<textarea name="notes">{{ entry.notes }}</textarea></label>
+        <label>Reference / UTR<input type="text" name="reference" value="{{ entry.reference }}"></label>
+        <button class="primary" type="submit">Save Changes</button>
+        <a class="ghost" href="{% url 'dashboard' %}?date={{ entry.entry_date|date:'Y-m-d' }}">Cancel</a>
+    </form>
+</section>
+{% endblock %}

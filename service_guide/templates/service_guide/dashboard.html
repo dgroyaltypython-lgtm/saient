@@ -1,0 +1,138 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Service Guide · Sai Enterprises{% endblock %}
+
+{% block content %}
+<section class="hero guide-hero">
+    <div>
+        <span class="eyebrow">SERVICE GUIDE · GEMINI</span>
+        <h1>Your <em>online service guide.</em></h1>
+        <p>
+            Ask in English, हिंदी or मराठी. Get simple step-by-step guidance
+            for government, education, certificates, applications and online forms.
+        </p>
+    </div>
+    <div class="guide-status">
+        {% if configured %}
+            <span class="status-dot"></span> AI Guide Ready
+        {% else %}
+            <span class="status-dot off"></span> Admin setup required
+        {% endif %}
+    </div>
+</section>
+
+<section class="guide-grid">
+    <div class="panel guide-chat">
+        <div class="guide-chat-head">
+            <div>
+                <span class="eyebrow">ASK YOUR GUIDE</span>
+                <h2>What do you want to do?</h2>
+            </div>
+            <form method="post" action="{% url 'service_guide_clear' %}">
+                {% csrf_token %}
+                <button class="ghost" type="submit">Clear chat</button>
+            </form>
+        </div>
+
+        <div class="chat-messages">
+            {% if not history %}
+                <div class="guide-welcome">
+                    <div class="guide-icon">✦</div>
+                    <h3>Namaste! How can I help?</h3>
+                    <p>
+                        Try: “मला पासपोर्ट काढायचा आहे, काय करावे?”
+                        or “How do I fill a 12th admission form?”
+                    </p>
+                    <div class="prompt-chips">
+                        <button type="button" onclick="setPrompt('मला पासपोर्टसाठी अर्ज करायचा आहे. स्टेप बाय स्टेप सांगा.')">Passport</button>
+                        <button type="button" onclick="setPrompt('मला 12th college admission form online भरायचा आहे. काय कागदपत्रे लागतील?')">12th / College</button>
+                        <button type="button" onclick="setPrompt('मला degree admission form भरायचा आहे. प्रक्रिया समजावून सांगा.')">Degree</button>
+                        <button type="button" onclick="setPrompt('मला Gazette notification करायचे आहे. प्रक्रिया काय आहे?')">Gazette</button>
+                    </div>
+                </div>
+            {% else %}
+                {% for item in history %}
+                    {% if item.role == "user" %}
+                        <div class="chat-row user-row">
+                            <div class="chat-bubble user-bubble">{{ item.content|linebreaksbr }}</div>
+                        </div>
+                    {% else %}
+                        <div class="chat-row guide-row">
+                            <div class="chat-avatar">SE</div>
+                            <div class="chat-bubble guide-bubble">{{ item.content|linebreaksbr }}</div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if error %}
+            <div class="guide-error">
+                <strong>Guide is not ready:</strong> {{ error }}
+                {% if request.user.is_superuser %}
+                    <a href="/admin/service_guide/geminiconfig/">Open Gemini Settings in Admin</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <form class="guide-input" method="post">
+            {% csrf_token %}
+            <textarea id="guide-message" name="message" rows="3"
+                placeholder="Ask in English, हिंदी or मराठी..."></textarea>
+            <div class="guide-input-foot">
+                <small>Do not enter passwords, OTPs, PINs or payment-card secrets.</small>
+                <button class="primary" type="submit">Ask Guide →</button>
+            </div>
+        </form>
+    </div>
+
+    <aside class="guide-side">
+        <div class="panel guide-card">
+            <span class="eyebrow">POPULAR SERVICES</span>
+            <h3>What I can guide you through</h3>
+            <ul>
+                <li>🛂 Passport applications</li>
+                <li>🎓 12th & degree admissions</li>
+                <li>📜 Gazette / name-change procedures</li>
+                <li>📄 Certificates & applications</li>
+                <li>🏛️ Government portals & schemes</li>
+                <li>🪪 Common online citizen services</li>
+            </ul>
+        </div>
+
+        <div class="panel guide-card">
+            <span class="eyebrow">HOW IT WORKS</span>
+            <h3>Simple guidance</h3>
+            <ol>
+                <li>Tell me what you need.</li>
+                <li>I explain the process.</li>
+                <li>I list documents and fields.</li>
+                <li>For current details, I can search the web.</li>
+                <li>You complete the application yourself.</li>
+            </ol>
+        </div>
+
+        {% if sources %}
+        <div class="panel guide-card">
+            <span class="eyebrow">SOURCES</span>
+            <h3>Web sources used</h3>
+            <div class="source-list">
+                {% for source in sources %}
+                    <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">
+                        {{ source.title }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </aside>
+</section>
+
+<script>
+function setPrompt(text) {
+    const box = document.getElementById("guide-message");
+    box.value = text;
+    box.focus();
+}
+</script>
+{% endblock %}

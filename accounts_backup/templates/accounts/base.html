@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Saiprasad Office Accounts{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'accounts/css/style.css' %}">
+</head>
+<body>
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+
+    <header class="topbar">
+        <a class="brand-link" href="{% url 'dashboard' %}">
+            <div class="brand">
+                <div class="brand-mark">ST</div>
+                <div>
+                    <strong>Saiprasad Tours and Travels</strong>
+                    <span>Office Accounts Studio</span>
+                </div>
+            </div>
+        </a>
+
+        <nav class="nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'add_entry' %}">＋ Entry</a>
+            <a href="/admin/">Admin</a>
+        </nav>
+    </header>
+
+    <main class="shell">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        Saiprasad Tours and Travels · Office Accounts Studio
+    </footer>
+</body>
+</html>

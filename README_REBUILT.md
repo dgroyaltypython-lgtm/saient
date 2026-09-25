@@ -8,7 +8,7 @@ This ZIP is a clean rebuild of the Django office accounts project.
 - Login/logout
 - StaffProfile office assignment
 - Strict staff office isolation
-- Global admin access for superusers / Django staff
+- Global admin access for superusers only
 - Multiple active offices
 - Daily collection and expense entries
 - Cash and UPI
@@ -72,28 +72,12 @@ A normal staff user cannot select or access another office by changing a URL.
 
 ## Admin
 
-A superuser or Django `is_staff` user is treated as a global administrator by the application and can select among active offices.
+Only a Django superuser is treated as a global administrator by the application. A normal employee must not be given Django `Staff status`; their StaffProfile determines their single office.
 
 ## Branding
 
 The application is branded **Sai Enterprises** throughout the web UI, PDF report and WhatsApp report.
 
 
-## Office isolation rule
-Only superusers are global administrators. Normal employees are restricted server-side to the one active office in their StaffProfile. The dashboard does not provide them an office list, and changing `?office=` or another office URL is rejected.
-
-
-## AI / Service Guide
-
-Gemini and Botpress are intentionally not included in this build. The accounting system is kept independent so an AI/service-guide integration can be added later without changing the office accounts features.
-
-## Django Admin: Users and Groups
-
-The custom Sai Enterprises admin site is superuser-only and includes:
-- Users — create and manage employee login accounts
-- Groups — manage Django permission groups
-- Office
-- DailyEntry
-- StaffProfile
-
-Creating a user does not assign an office automatically. After creating an employee login under **Users**, create/update the matching **StaffProfile** and assign the employee to exactly one active office. Application-level office isolation remains enforced server-side. `is_staff` does not grant global application access; only a superuser is treated as the global admin.
+### Gemini quota/error handling
+The Service Guide now keeps Gemini prompts compact, limits output length, handles transient 429/503 errors with a capped retry, and shows a user-friendly quota message instead of exposing the raw API error. Daily/project quota exhaustion is not repeatedly retried.

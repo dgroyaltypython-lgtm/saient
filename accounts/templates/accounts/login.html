@@ -1,0 +1,33 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Login · Sai Enterprises{% endblock %}
+
+{% block content %}
+<section class="panel login-panel">
+    <span class="eyebrow">STAFF LOGIN</span>
+    <h1>Sign in to <em>Sai Enterprises</em></h1>
+    <p>Your account determines which office data you can access.</p>
+
+    {% if form.errors %}
+        <div class="form-errors">
+            Username or password is incorrect. Please try again.
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>
+            Username
+            {{ form.username }}
+        </label>
+
+        <label>
+            Password
+            {{ form.password }}
+        </label>
+
+        <button class="primary" type="submit">Sign In</button>
+    </form>
+</section>
+{% endblock %}

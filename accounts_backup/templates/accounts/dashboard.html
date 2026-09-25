@@ -1,0 +1,114 @@
+{% extends "accounts/base.html" %}
+{% block content %}
+
+<section class="hero">
+    <div>
+        <span class="eyebrow">OFFICE ACCOUNTS</span>
+        <h1>Daily <em>collections & expenses</em> at a glance.</h1>
+        {% if staff_office %}
+        <p>Logged in as <strong>{{ request.user.get_username }}</strong> · {{ staff_office.name }}</p>
+        {% else %}
+        <p>Track cash and UPI collections, daily expenses and office reports.</p>
+        {% endif %}
+    </div>
+    <a class="primary" href="{% url 'add_entry' %}">＋ Add Daily Entry</a>
+</section>
+
+{% if offices %}
+<section class="panel toolbar">
+    <form class="filter" method="get">
+        {% if is_global_admin %}
+        <label>Office
+            <select name="office">
+                {% for o in offices %}
+                <option value="{{ o.id }}" {% if selected_office and selected_office.id == o.id %}selected{% endif %}>
+                    {{ o.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </label>
+        {% else %}
+        <label>Office
+            <input value="{{ selected_office.name }}" readonly>
+        </label>
+        {% endif %}
+
+        <label>Date
+            <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+        </label>
+
+        <label>Search
+            <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Reason, notes or reference">
+        </label>
+
+        <label>Type
+            <select name="type">
+                <option value="">All</option>
+                <option value="collection" {% if request.GET.type == "collection" %}selected{% endif %}>Collection</option>
+                <option value="expense" {% if request.GET.type == "expense" %}selected{% endif %}>Expense</option>
+            </select>
+        </label>
+
+        <button class="ghost" type="submit">View Day</button>
+    </form>
+
+    {% if selected_office %}
+    <div class="actions">
+        <a class="ghost" href="{% url 'daily_pdf' selected_office.id %}?date={{ selected_date|date:'Y-m-d' }}">PDF Report</a>
+        <a class="wa" href="{% url 'whatsapp_daily' selected_office.id %}?date={{ selected_date|date:'Y-m-d' }}">WhatsApp</a>
+    </div>
+    {% endif %}
+</section>
+
+<section class="cards">
+    <div class="stat"><span>COLLECTION</span><strong>₹ {{ collection|floatformat:2 }}</strong><small>Cash ₹{{ cash_collection|floatformat:2 }} · UPI ₹{{ upi_collection|floatformat:2 }}</small></div>
+    <div class="stat"><span>EXPENSES</span><strong class="red">₹ {{ expense|floatformat:2 }}</strong><small>Daily office expenses</small></div>
+    <div class="stat"><span>NET BALANCE</span><strong class="purple">₹ {{ balance|floatformat:2 }}</strong><small>Collection minus expenses</small></div>
+</section>
+
+<section class="panel table-panel">
+    <div class="head">
+        <div>
+            <h2>{{ selected_office.name }}</h2>
+            <p>{{ selected_date }} · {{ entries|length }} entries</p>
+        </div>
+    </div>
+
+    {% if entries %}
+    <div class="scroll">
+        <table>
+            <thead><tr><th>Type</th><th>Reason</th><th>Mode</th><th>Reference</th><th>Amount</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for e in entries %}
+            <tr>
+                <td><span class="pill {{ e.entry_type }}">{{ e.get_entry_type_display }}</span></td>
+                <td><b>{{ e.reason }}</b>{% if e.notes %}<small>{{ e.notes }}</small>{% endif %}</td>
+                <td>{{ e.get_payment_mode_display }}</td>
+                <td>{{ e.reference|default:"—" }}</td>
+                <td class="amt {% if e.entry_type == 'expense' %}red{% else %}green{% endif %}">{% if e.entry_type == 'expense' %}−{% else %}+{% endif %} ₹{{ e.amount|floatformat:2 }}</td>
+                <td>
+                    <a class="ghost" href="{% url 'edit_entry' e.id %}">Edit</a>
+                    <form method="post" action="{% url 'delete_entry' e.id %}" style="display:inline" onsubmit="return confirm('Delete this entry?')">
+                        {% csrf_token %}<button class="x" type="submit" title="Delete entry">×</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty">No entries for this office and date.</div>
+    {% endif %}
+</section>
+
+{% else %}
+<section class="panel empty-state">
+    <div class="empty-icon">🏢</div>
+    <span class="eyebrow">ACCOUNT SETUP</span>
+    <h2>No office is assigned to this account.</h2>
+    <p>Please ask an administrator to assign your user account to an office.</p>
+</section>
+{% endif %}
+
+{% endblock %}

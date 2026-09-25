@@ -1,0 +1,76 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}{{ page_title }} · Saiprasad Office Accounts{% endblock %}
+
+{% block content %}
+
+<section class="hero compact">
+    <div>
+        <span class="eyebrow">{% if editing %}EDIT ENTRY{% else %}DAILY ENTRY{% endif %}</span>
+        <h1>{% if editing %}Correct a <em>ledger entry.</em>{% else %}Record a <em>collection or expense.</em>{% endif %}</h1>
+        <p>
+            {% if editing %}
+                Update the transaction and save the corrected details.
+            {% else %}
+                Keep every office transaction simple, clear and searchable.
+            {% endif %}
+        </p>
+    </div>
+
+    <a class="ghost" href="{% url 'dashboard' %}">← Dashboard</a>
+</section>
+
+<section class="panel form-panel">
+    <div class="head">
+        <div>
+            <span class="eyebrow">TRANSACTION DETAILS</span>
+            <h2>{{ page_title }}</h2>
+            <p>All important fields are validated before saving.</p>
+        </div>
+    </div>
+
+    <form method="post" class="entry-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="grid">
+            {% for field in form %}
+                <label class="{% if field.errors %}has-error{% endif %}">
+                    {{ field.label }}
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <span class="field-error">{{ error }}</span>
+                    {% endfor %}
+                </label>
+            {% endfor %}
+        </div>
+
+        <div class="actions form-actions">
+            <button class="primary" type="submit">
+                {% if editing %}✓ Save Changes{% else %}✦ Save Entry{% endif %}
+            </button>
+
+            {% if editing and entry %}
+                <a class="ghost" href="{% url 'dashboard' %}?office={{ entry.office_id }}&date={{ entry.entry_date }}">
+                    Cancel
+                </a>
+            {% else %}
+                <a class="ghost" href="{% url 'dashboard' %}">
+                    Cancel
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+{% endblock %}

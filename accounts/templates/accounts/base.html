@@ -1,0 +1,57 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Sai Enterprises Office Accounts{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'accounts/css/style.css' %}">
+</head>
+<body>
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+
+    <header class="topbar">
+        <a class="brand-link" href="{% url 'dashboard' %}">
+            <div class="brand">
+                <div class="brand-mark">SE</div>
+                <div>
+                    <strong>Sai Enterprises</strong>
+                    <span>Office Accounts Studio</span>
+                </div>
+            </div>
+        </a>
+
+        <nav class="nav">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'add_entry' %}">＋ Entry</a>
+
+            {% if request.user.is_superuser %}
+                <a href="/admin/">Admin</a>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+                <span class="nav-user">👤 {{ request.user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="shell">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        Sai Enterprises · Office Accounts Studio
+    </footer>
+</body>
+</html>
